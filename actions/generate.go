@@ -47,8 +47,7 @@ func GenerateAddresses(coins []string) []Address {
 			break
 
 		default:
-			log.Fatalln("Error: Unknown ", crypto)
-			log.Fatalln("... would you like to implement it?")
+			log.Fatalln("Error: Unknown ", crypto, "... would you like to implement it?")
 			break
 		}
 
