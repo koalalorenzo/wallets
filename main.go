@@ -1,57 +1,60 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"flag"
 
-	"github.com/koalalorenzo/wallets/generators"
+	"github.com/koalalorenzo/wallets/actions"
 )
 
-var coins = flag.String("coins", "all", "the coins to use")
-var help = flag.Bool("help", false, "Help message")
+var coinsOption = flag.String("coins", "all", "the coins to use")
+var generateOption = flag.Bool("gen", false, "generate new wallets")
+var outputOption = flag.String("o", "", "path of the output (optional)")
+
+var encryptOption = flag.Bool("e", false, "encrypt the private keys instantly")
+var encryptAlgoOption = flag.String("ealgo", "AES", "Specify the encryption algorithm between AES and PGP")
+var encryptMainOption = flag.String("eopt", "", "if -ealgo == AES: password, if -ealgo == PGP: path of pgp pub key")
+
+var decryptOption = flag.Bool("d", false, "decrypt the private keys")
+var decryptOptionPath = flag.String("dpath", "./wallet.json.aes", "path of the encrypted file")
 
 func main() {
 	flag.Parse()
+	var output string
+	// From here Actions (Generate or Decrypt)
 
-	if *help != false {
-		fmt.Println("HELP")
-		os.Exit(0)
-	}
-
-	leftovers := strings.Split(*coins, ",")
-	privates := [][]string{}
-
-	for i := range leftovers {
-		crypto := leftovers[i]
-
-		switch crypto {
-
-		case "ETH":
-			pub, priv, err := generators.GenerateETH()
-			if err != nil {
-				log.Fatalf("Generating ETH: %s\n", err)
-			}
-			privates = append(privates, []string{"ETH", pub, priv})
-
-		case "BTC":
-			pub, priv, err := generators.GenerateBTC()
-			if err != nil {
-				log.Fatalf("Generating BTC: %s\n", err)
-			}
-			privates = append(privates, []string{"BTC", pub, priv})
-
-		default:
-			break
+	// If the decryption is allowed, the decrypt the output
+	if *generateOption == true {
+		allCoins := actions.GenerateCoins(*coinsOption)
+		jsonCoins, err := json.Marshal(allCoins)
+		if err != nil {
+			log.Panic(err)
 		}
-
+		output = string(jsonCoins[:])
 	}
 
-	for i := range privates {
-		fmt.Println(privates[i])
+	// If the decryption is allowed, then check the file and decrypt it
+	if *decryptOption == true && *encryptOption == false {
+		output = actions.DecryptOutput(*decryptOptionPath, *encryptAlgoOption, *encryptMainOption)
+	}
+
+	// From here: Output handling
+
+	// If the encryptio is allowed, the encrypt the output
+	if *encryptOption == true && *decryptOption == false {
+		output = actions.EncryptOutput(output, *encryptAlgoOption, *encryptMainOption)
+	}
+
+	if *outputOption == "" {
+		fmt.Println(output)
+		os.Exit(0)
+	} else {
+		actions.SaveToFile(*outputOption, []byte(output))
+		os.Exit(0)
 	}
 
 }
