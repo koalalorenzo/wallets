@@ -12,7 +12,8 @@ import (
 // used.
 //
 // AES: When using AES encryption, you can sepcify the encryptMainOption as the
-//      key that you want to use to encrypt the text (16 or 32 bit keys).
+//      key that you want to use to encrypt the text. Any lenght is valid,
+//      since it will hash the value and use the first 32 bit as key.
 //
 // PGP: Not yet implemented, but the idea is that encryptMainOption will be
 //      used as path for the gpg pub key.

@@ -63,7 +63,7 @@ func main() {
 
 	if output == "" {
 		output = "Invalid options. Check --help "
-		*outputOption = ""
+		*outputOption = "" // Do not save to file
 		exitStatus = 1
 	}
 
