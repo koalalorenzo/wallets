@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"flag"
 
@@ -25,21 +26,32 @@ var decryptOptionPath = flag.String("dpath", "./wallet.json.aes", "path of the e
 func main() {
 	flag.Parse()
 	var output string
+	var exitStatus int
 	// From here Actions (Generate or Decrypt)
 
 	// If the decryption is allowed, the decrypt the output
 	if *generateOption == true {
-		allCoins := actions.GenerateCoins(*coinsOption)
+		// Parsing the coins available
+		var coins []string
+		if *coinsOption != "all" {
+			coins = strings.Split(*coinsOption, ",")
+		} else {
+			coins = []string{}
+		}
+
+		allCoins := actions.GenerateAddresses(coins)
 		jsonCoins, err := json.Marshal(allCoins)
 		if err != nil {
 			log.Panic(err)
 		}
 		output = string(jsonCoins[:])
+		exitStatus = 0
 	}
 
 	// If the decryption is allowed, then check the file and decrypt it
 	if *decryptOption == true && *encryptOption == false {
 		output = actions.DecryptOutput(*decryptOptionPath, *encryptAlgoOption, *encryptMainOption)
+		exitStatus = 0
 	}
 
 	// From here: Output handling
@@ -49,12 +61,18 @@ func main() {
 		output = actions.EncryptOutput(output, *encryptAlgoOption, *encryptMainOption)
 	}
 
+	if output == "" {
+		output = "Invalid options. Check --help "
+		*outputOption = ""
+		exitStatus = 1
+	}
+
 	if *outputOption == "" {
 		fmt.Println(output)
-		os.Exit(0)
+		os.Exit(exitStatus)
 	} else {
 		actions.SaveToFile(*outputOption, []byte(output))
-		os.Exit(0)
+		os.Exit(exitStatus)
 	}
 
 }
