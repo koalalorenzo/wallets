@@ -1,9 +1,11 @@
 package actions
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 
+	"github.com/howeyc/gopass"
 	"github.com/koalalorenzo/wallets/encryption"
 )
 
@@ -22,6 +24,11 @@ func EncryptOutput(plainContent, encryptAlgoOption, encryptMainOption string) st
 	switch encryptAlgoOption {
 
 	case "AES":
+		// Require a valid password if it was not provided
+		if encryptMainOption == "" {
+			encryptMainOption = getValidPasswd()
+		}
+
 		// ToDo Move this into a function?
 		key := []byte(encryptMainOption)
 		encryptedContent, err := encryption.AESEncrypt(key, plainContent)
@@ -57,6 +64,12 @@ func DecryptOutput(decryptOptionPath, encryptAlgoOption, encryptMainOption strin
 
 	case "AES":
 		// ToDo Move this into a function?
+
+		// Require a valid password if it was not provided
+		if encryptMainOption == "" {
+			encryptMainOption = getValidPasswd()
+		}
+
 		key := []byte(encryptMainOption)
 		content := string(encryptedFile[:])
 		encryptedContent, err := encryption.AESDecrypt(key, content)
@@ -76,4 +89,21 @@ func DecryptOutput(decryptOptionPath, encryptAlgoOption, encryptMainOption strin
 		break
 	}
 	return ""
+}
+
+func getValidPasswd() string {
+	var passwd string
+	for {
+		if passwd == "" {
+			fmt.Printf("Password: ")
+			passbyte, err := gopass.GetPasswd()
+			if err != nil {
+				log.Panicln(err)
+			}
+			passwd = string(passbyte[:])
+		} else {
+			break
+		}
+	}
+	return passwd
 }
