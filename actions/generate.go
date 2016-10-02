@@ -2,6 +2,7 @@ package actions
 
 import (
 	"log"
+	"strings"
 
 	"github.com/koalalorenzo/wallets/generators"
 )
@@ -25,15 +26,17 @@ func GenerateAddresses(coins []string) []Address {
 
 	for i := range coins {
 		crypto := coins[i]
+		crypto = strings.ToUpper(crypto)
 
 		switch crypto {
 
+		case "ETC":
 		case "ETH":
 			pub, priv, err := generators.GenerateETH()
 			if err != nil {
 				log.Fatalf("Generating ETH: %s\n", err)
 			}
-			newAddress := Address{"ETH", priv, pub}
+			newAddress := Address{crypto, priv, pub}
 			generatedCoins = append(generatedCoins, newAddress)
 			break
 
@@ -42,7 +45,7 @@ func GenerateAddresses(coins []string) []Address {
 			if err != nil {
 				log.Fatalf("Generating BTC: %s\n", err)
 			}
-			newAddress := Address{"BTC", priv, pub}
+			newAddress := Address{crypto, priv, pub}
 			generatedCoins = append(generatedCoins, newAddress)
 			break
 
