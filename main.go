@@ -12,16 +12,21 @@ import (
 	"github.com/koalalorenzo/wallets/actions"
 )
 
-var coinsOption = flag.String("coins", "all", "the coins to use")
-var generateOption = flag.Bool("gen", false, "generate new wallets")
-var outputOption = flag.String("o", "", "path of the output (optional)")
+// Creation of the wallet action
+var generateOption = flag.Bool("new", false, "create a new wallets")
+var coinsOption = flag.String("coins", "all", "the coins to use [BTC, ETH]")
+var outputOptionPath = flag.String("save-to", "", "define where (path) to save the wallet file")
+var walletOptionPath = flag.String("wallet-file", "./wallet.json.aes", "define where (path) to read the encrypted wallet file")
 
-var encryptOption = flag.Bool("e", false, "encrypt the private keys instantly")
-var encryptAlgoOption = flag.String("ealgo", "AES", "Specify the encryption algorithm between AES and PGP")
-var encryptMainOption = flag.String("eopt", "", "if -ealgo == AES: password, if -ealgo == PGP: path of pgp pub key")
+// Existing wallet info action
+var infoOption = flag.Bool("show-info", false, "show the wallet info")
 
-var decryptOption = flag.Bool("d", false, "decrypt the private keys")
-var decryptOptionPath = flag.String("dpath", "./wallet.json.aes", "path of the encrypted file")
+// Decription action
+var exportOption = flag.Bool("export-json", false, "decrypt the private keys and print the JSON structure")
+
+// Encryption options
+var encryptOption = flag.Bool("encrypt", false, "encrypt the private keys instantly")
+var encryptMainOption = flag.String("password", "", "(optional) the password used to encrypt the wallet")
 
 func main() {
 	flag.Parse()
@@ -30,7 +35,7 @@ func main() {
 	// From here Actions (Generate or Decrypt)
 
 	// If the decryption is allowed, the decrypt the output
-	if *generateOption == true {
+	if *generateOption == true && len(output) == 0 {
 		// Parsing the coins available
 		var coins []string
 		if *coinsOption != "all" {
@@ -48,30 +53,37 @@ func main() {
 		exitStatus = 0
 	}
 
+	// If the decryption is allowed, the decrypt the output
+	if *infoOption == true && len(output) == 0 {
+		// Parsing the coins available
+		output = actions.ShowWalletPubKeys(*walletOptionPath)
+		exitStatus = 0
+	}
+
 	// If the decryption is allowed, then check the file and decrypt it
-	if *decryptOption == true && *encryptOption == false {
-		output = actions.DecryptOutput(*decryptOptionPath, *encryptAlgoOption, *encryptMainOption)
+	if *exportOption == true && *encryptOption == false && len(output) == 0 {
+		output = actions.DecryptOutput(*walletOptionPath, "AES", *encryptMainOption)
 		exitStatus = 0
 	}
 
 	// From here: Output handling
 
 	// If the encryptio is allowed, the encrypt the output
-	if *encryptOption == true && *decryptOption == false {
-		output = actions.EncryptOutput(output, *encryptAlgoOption, *encryptMainOption)
+	if *encryptOption == true && *exportOption == false {
+		output = actions.EncryptOutput(output, "AES", *encryptMainOption)
 	}
 
 	if output == "" {
 		output = "Invalid options. Check --help "
-		*outputOption = "" // Do not save to file
+		*outputOptionPath = "" // Do not save to file
 		exitStatus = 1
 	}
 
-	if *outputOption == "" {
+	if *outputOptionPath == "" {
 		fmt.Println(output)
 		os.Exit(exitStatus)
 	} else {
-		actions.SaveToFile(*outputOption, []byte(output))
+		actions.SaveToFile(*outputOptionPath, []byte(output))
 		os.Exit(exitStatus)
 	}
 
