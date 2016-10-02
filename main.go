@@ -16,7 +16,7 @@ import (
 var generateOption = flag.Bool("new", false, "create a new wallets")
 var coinsOption = flag.String("coins", "all", "the coins to use [BTC, ETH]")
 var outputOptionPath = flag.String("save-to", "", "define where (path) to save the wallet file")
-var walletOptionPath = flag.String("wallet-file", "./wallet.json.aes", "define where (path) to read the encrypted wallet file")
+var walletOptionPath = flag.String("wallet-file", "", "define where (path) to read the encrypted wallet file")
 
 // Existing wallet info action
 var infoOption = flag.Bool("show-info", false, "show the wallet info")
@@ -56,8 +56,13 @@ func main() {
 	// If the decryption is allowed, the decrypt the output
 	if *infoOption == true && len(output) == 0 {
 		// Parsing the coins available
-		output = actions.ShowWalletPubKeys(*walletOptionPath)
-		exitStatus = 0
+		if len(*walletOptionPath) == 0 {
+			output = "Please specify a path with --wallet-file"
+			exitStatus = 1
+		} else {
+			output = actions.ShowWalletPubKeys(*walletOptionPath)
+			exitStatus = 0
+		}
 	}
 
 	// If the decryption is allowed, then check the file and decrypt it
@@ -74,12 +79,11 @@ func main() {
 	}
 
 	if output == "" {
-		output = "Invalid options. Check --help "
-		*outputOptionPath = "" // Do not save to file
+		output = "Invalid options/flags. Check --help "
 		exitStatus = 1
 	}
 
-	if *outputOptionPath == "" {
+	if *outputOptionPath == "" || exitStatus != 0 {
 		fmt.Println(output)
 		os.Exit(exitStatus)
 	} else {
