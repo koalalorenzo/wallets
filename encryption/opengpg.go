@@ -9,8 +9,8 @@ import (
 	"golang.org/x/crypto/openpgp"
 )
 
-// Encrypt will encrypt a string.
-func Encrypt(secretString, pubKeyPath string) (string, error) {
+// PGPEncrypt will encrypt a string.
+func PGPEncrypt(secretString, pubKeyPath string) (string, error) {
 	keyringFileBuffer, _ := os.Open(pubKeyPath)
 	defer keyringFileBuffer.Close()
 	entityList, err := openpgp.ReadKeyRing(keyringFileBuffer)
