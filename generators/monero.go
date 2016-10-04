@@ -2,6 +2,7 @@ package generators
 
 import (
 	"crypto/rand"
+	"strings"
 
 	"github.com/ehmry/monero"
 )
@@ -12,5 +13,10 @@ func GenerateXMR() (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	return account.Address().String(), account.String(), nil
+	mnemonic, err := account.Mnemonic()
+	if err != nil {
+		return "", "", err
+	}
+	mnemonicStr := strings.Join(mnemonic, " ")
+	return mnemonicStr, account.Address().String(), nil
 }
