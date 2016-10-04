@@ -19,7 +19,7 @@ type Address struct {
 // generated. Currently supporting ETH and BTC only.
 func GenerateAddresses(coins []string) []Address {
 	if len(coins) == 0 {
-		coins = []string{"ETH", "BTC"}
+		coins = []string{"ETH", "BTC", "XMR"}
 	}
 
 	generatedCoins := []Address{}
@@ -44,6 +44,15 @@ func GenerateAddresses(coins []string) []Address {
 			pub, priv, err := generators.GenerateBTC()
 			if err != nil {
 				log.Fatalf("Generating BTC: %s\n", err)
+			}
+			newAddress := Address{crypto, priv, pub}
+			generatedCoins = append(generatedCoins, newAddress)
+			break
+
+		case "XMR":
+			pub, priv, err := generators.GenerateXMR()
+			if err != nil {
+				log.Fatalf("Generating XMR: %s\n", err)
 			}
 			newAddress := Address{crypto, priv, pub}
 			generatedCoins = append(generatedCoins, newAddress)

@@ -14,7 +14,7 @@ import (
 
 // Creation of the wallet action
 var generateOption = flag.Bool("new", false, "create a new wallets")
-var coinsOption = flag.String("coins", "all", "the coins to use [BTC, ETH]")
+var coinsOption = flag.String("coins", "all", "the coins to use [BTC, ETH, XMR]")
 var outputOptionPath = flag.String("save-to", "", "define where (path) to save the wallet file")
 var walletOptionPath = flag.String("wallet-file", "", "define where (path) to read the encrypted wallet file")
 

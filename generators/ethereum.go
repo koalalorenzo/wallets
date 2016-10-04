@@ -6,7 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-// GenerateETH returns a private and a public key
+// GenerateETH returns an Ethereum private and a public key
 func GenerateETH() (string, string, error) {
 	key, _ := crypto.GenerateKey()
 	addr := crypto.PubkeyToAddress(key.PublicKey)

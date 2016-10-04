@@ -6,7 +6,7 @@ import (
 	"github.com/btcsuite/btcutil"
 )
 
-// GenerateBTC returns a private and a public key
+// GenerateBTC returns a Bitcoin private and a public key
 func GenerateBTC() (string, string, error) {
 	privKey, err := btcec.NewPrivateKey(btcec.S256())
 	if err != nil {
