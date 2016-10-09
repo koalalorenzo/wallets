@@ -9,13 +9,13 @@ import (
 	"io"
 )
 
-// fixLengthKeyHash will transform the key ([]byte) into the first 32 bytes of
-// its SHA256 checksum. This forces users to use this software to decrypt, but
-// will increase security allowing them to any key length.
+// fixLengthKeyHash will transform the key ([]byte) into the first its SHA256
+// checksum. This forces users to use this software to decrypt, but will
+// increase security allowing them to any key length.
 func fixLengthKeyHash(bytes []byte) []byte {
 	h := sha256.New()
 	h.Write(bytes)
-	return h.Sum(nil)[:32]
+	return h.Sum(nil)
 }
 
 // AESEncrypt encrypts string to base64 crypto using AES
