@@ -1,6 +1,8 @@
 package generators
 
 import (
+	"encoding/hex"
+
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcutil"
@@ -25,4 +27,25 @@ func GenerateBTC() (string, string, error) {
 	}
 
 	return privKeyWif.String(), pubKeyAddress.EncodeAddress(), nil
+}
+
+//SignBTCHexTransaction will sign a transaction (hex format) and return its hex
+// WIP
+func SignBTCHexTransaction(hexTx, privWIFKey string) (string, error) {
+
+	txHexBytes, err := hex.DecodeString(hexTx)
+	if err != nil {
+		return "", err
+	}
+
+	wifKey, err := btcutil.DecodeWIF(privWIFKey)
+	wifKey.IsForNet(&chaincfg.MainNetParams)
+	wifKey.CompressPubKey = false
+
+	signature, err := wifKey.PrivKey.Sign(txHexBytes)
+	if err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(signature.Serialize()), nil
 }
