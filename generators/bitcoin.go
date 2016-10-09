@@ -13,11 +13,11 @@ func GenerateBTC() (string, string, error) {
 		return "", "", err
 	}
 
-	privKeyWif, err := btcutil.NewWIF(privKey, &chaincfg.MainNetParams, true)
+	privKeyWif, err := btcutil.NewWIF(privKey, &chaincfg.MainNetParams, false)
 	if err != nil {
 		return "", "", err
 	}
-	pubKeySerial := privKey.PubKey().SerializeCompressed()
+	pubKeySerial := privKey.PubKey().SerializeUncompressed()
 
 	pubKeyAddress, err := btcutil.NewAddressPubKey(pubKeySerial, &chaincfg.MainNetParams)
 	if err != nil {
