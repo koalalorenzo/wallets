@@ -2,6 +2,8 @@
 Wallets is a multi-coin wallet designed for cold storage with built-in 
 encryption.
 
+**Important Note**: This is not production-ready, and by using this software you realize that the authors/owners and mantainers are not responsible for any money loss, missusage etc. etc. etc. and you are fully responsible of your own actions and decisions. **TL;DR**: So do not use if you don't know what you are doing. Read the code. You are fully responsible of your own stuff... and don't sue us if you lose money.
+
 The main features are:
 
  * Simple to use via CLI
